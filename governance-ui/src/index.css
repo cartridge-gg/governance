@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Gameified color palette */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
+    --card: 120 20% 7%;
+    --card-foreground: 0 0% 95%;
+    --popover: 120 20% 7%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 48 100% 74%; /* Gold #FFE97F */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 120 50% 10%;
+    --secondary-foreground: 48 100% 74%;
+    --muted: 120 20% 15%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 135 100% 56%; /* Lime green #1aff5c */
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 60% 15%;
+    --input: 0 0% 0%;
+    --ring: 48 100% 74%;
+    --radius: 0.5rem;
+
+    /* Custom properties */
+    --gold: #FFE97F;
+    --gold-hover: #FFD700;
+    --lime: #1aff5c;
+    --forest: #003311;
+    --dark-green: rgb(8, 62, 34);
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
+    --card: 120 20% 7%;
+    --card-foreground: 0 0% 95%;
+    --popover: 120 20% 7%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 48 100% 74%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 120 50% 10%;
+    --secondary-foreground: 48 100% 74%;
+    --muted: 120 20% 15%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 135 100% 56%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 60% 15%;
+    --input: 0 0% 0%;
+    --ring: 48 100% 74%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply dark;
+  }
+
+  body {
+    @apply text-foreground;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/images/ammit.png');
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    z-index: -2;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 26, 13, 0.6) 0%, rgba(0, 51, 17, 0.6) 100%);
+    z-index: -1;
+  }
+
+  #root {
+    position: relative;
+    min-height: 100vh;
+    background: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255, 233, 127, 0.5), 0 2px 8px #003311;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 51, 17, 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-hover);
+  }
+
+  /* Glowing text animation */
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 30px rgba(255, 233, 127, 0.5), 0 2px 8px #003311;
+    }
+    to {
+      text-shadow: 0 0 40px rgba(255, 233, 127, 0.8), 0 2px 12px #003311;
+    }
+  }
+
+  @keyframes pulse-lime {
+    from {
+      text-shadow: 0 0 20px rgba(26, 255, 92, 0.5);
+    }
+    to {
+      text-shadow: 0 0 30px rgba(26, 255, 92, 0.8);
+    }
+  }
+
+  .glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .pulse-lime {
+    animation: pulse-lime 2s ease-in-out infinite alternate;
+  }
+}
+
+@layer components {
+  /* Gameified card styles - matching claims app */
+  .game-card {
+    @apply relative overflow-hidden rounded-xl;
+    background: rgba(17, 17, 17, 0.95);
+    border: 2px solid rgb(8, 62, 34);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .game-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+    box-shadow: 0 12px 40px rgba(255, 233, 127, 0.25);
+  }
+
+  /* Main container card - for pages */
+  .main-container {
+    background: rgba(17, 17, 17, 0.95);
+    border: 2px solid rgb(8, 62, 34);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+  }
+
+  /* Metric card style */
+  .metric-card {
+    background: rgba(255, 233, 127, 0.05);
+    border: 1px solid rgba(255, 233, 127, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .metric-card:hover {
+    background: rgba(255, 233, 127, 0.08);
+    transform: translateY(-1px);
+  }
+
+  /* Game button styles */
+  .btn-gold {
+    background: linear-gradient(135deg, #FFE97F 0%, #FFD700 100%);
+    color: #000000;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(255, 233, 127, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 233, 127, 0.4);
+  }
+
+  .btn-gold-outline {
+    background: transparent;
+    color: var(--gold);
+    font-weight: 600;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(255, 233, 127, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .btn-gold-outline:hover {
+    background: rgba(255, 233, 127, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 233, 127, 0.3);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #1aff5c 0%, #00cc44 100%);
+    color: #000000;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(26, 255, 92, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 255, 92, 0.4);
+  }
+
+  /* Gameified input styles */
+  .game-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgb(8, 62, 34);
+    border-radius: 8px;
+    color: white;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+  }
+
+  .game-input:focus {
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 2px rgba(255, 233, 127, 0.2);
+    outline: none;
+  }
+
+  /* Badge styles */
+  .badge-gold {
+    background: rgba(255, 233, 127, 0.2);
+    color: var(--gold);
+    border: 1px solid rgba(255, 233, 127, 0.3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+  }
+
+  .badge-lime {
+    background: rgba(26, 255, 92, 0.2);
+    color: var(--lime);
+    border: 1px solid rgba(26, 255, 92, 0.3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+  }
+}

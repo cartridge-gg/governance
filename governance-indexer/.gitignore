@@ -1,0 +1,7 @@
+.env.sepolia.local
+.env.mainnet.local
+.env.local
+*.cursor.json
+dist/
+node_modules
+scripts/
