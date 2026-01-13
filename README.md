@@ -1,180 +1,299 @@
-# Governance Stack - Railway Deployment
+# Governance Stack - Backend
 
-Full-stack governance application with indexer, API, and UI.
+Backend services for the Starknet governance application, including indexing, databases, and REST API.
 
 ## Architecture
 
-- **Postgres**: Database for indexed blockchain data
-- **Indexer**: Apibara-based indexer for OpenZeppelin Governor events
-- **PostgREST**: Automatic REST API for Postgres
-- **UI**: React + Vite frontend
+This repository contains the core governance backend services:
 
-## Local Development
+- **db**: PostgreSQL database for governance data (proposals, votes, delegates)
+- **indexer**: Apibara-based indexer for OpenZeppelin Governor events
+- **api**: Custom Express REST API serving governance data only
+
+### Separate Repositories & Services
+
+- **swaps-indexer + swaps-db + swaps-api**: Deployed separately in its own repository with its own database and API
+- **ui**: Frontend deployed separately (Vercel/Netlify)
+
+### Architecture Benefits
+
+This split architecture provides:
+- **Performance**: Governance queries are fast and not impacted by swap data volume
+- **Scalability**: Each service can be scaled independently
+- **Reliability**: Governance remains available even if swaps service has issues
+- **Maintenance**: Simpler to manage, backup, and optimize each service separately
+- **Deployment**: Independent deployment cycles for each service
+
+## Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- Apibara DNA token (get from https://app.apibara.com/)
+- Your Starknet contract addresses
+
+### Setup
+
+1. **Create environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` with your values:**
+   ```bash
+   DNA_TOKEN=dna_your_actual_token_here
+   GOVERNOR_ADDRESS=0x...
+   VOTES_TOKEN_ADDRESS=0x...
+   ```
+
+3. **Start all backend services:**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **View logs:**
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Services will be running at:**
+   - API: http://localhost:4000
+   - Governance DB: localhost:5432
+
+   **Note**: The UI is deployed separately (configure it to point to your API URL)
+
+### Useful Commands
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
 # Stop all services
 docker-compose down
+
+# Fresh start (removes all data)
+docker-compose down -v
+
+# Rebuild after code changes
+docker-compose up -d --build
+
+# View specific service logs
+docker-compose logs -f indexer
+docker-compose logs -f api
 ```
 
-The app will be available at:
-- UI: http://localhost:8080
-- PostgREST API: http://localhost:3000
-- Postgres: localhost:5432
+## Production Deployment
 
-## Railway Deployment
+This repository deploys only the governance backend services. The swaps services and ui are deployed separately.
 
-Railway doesn't natively support docker-compose, so you'll deploy each service separately in a single Railway project.
+### Railway Deployment (Governance Backend)
 
-### Setup Steps
+Deploy these 3 services to Railway:
+1. **PostgreSQL database** (governance data only)
+2. **Governance indexer** (from this GitHub repo)
+3. **Governance API** (from this GitHub repo)
 
-1. **Create a Railway Project**
-   ```bash
-   railway login
-   railway init
-   ```
+For detailed deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
 
-2. **Add Postgres Database**
-   - In Railway dashboard, click "+ New"
-   - Select "Database" → "PostgreSQL"
-   - Note the connection string from the "Connect" tab
+### External Service Configuration
 
-3. **Deploy Indexer Service**
-   ```bash
-   cd indexer
-   railway up
-   ```
+**Swaps Services** (separate repository):
+- Deploy swaps-indexer + swaps-db + swaps-api in a separate Railway project or repository
+- These services handle all swap and price data independently
 
-   Set environment variables in Railway dashboard:
-   - `NETWORK`: `mainnet` or `sepolia`
-   - `PG_CONNECTION_STRING`: Use Railway Postgres connection string
-   - `APIBARA_URL`: Your Apibara DNA endpoint
-   - `DNA_TOKEN`: Your Apibara API token
-   - `GOVERNOR_ADDRESS`: Your governor contract address
-   - `VOTES_TOKEN_ADDRESS`: Your ERC20Votes token address
-   - `STARTING_CURSOR_BLOCK_NUMBER`: Block to start indexing from
-   - `LOG_LEVEL`: `info`
+**Governance UI** (deployed on Vercel/Netlify):
+- Set environment variable: `VITE_API_URL=https://your-api.railway.app`
 
-4. **Deploy PostgREST Service**
+**API CORS Configuration**:
+- Update `CORS_ORIGIN` to allow your UI domain: `CORS_ORIGIN=https://your-ui-domain.vercel.app`
 
-   In Railway dashboard:
-   - Click "+ New" → "Empty Service"
-   - Go to "Settings" → "Source"
-   - Deploy from image: `postgrest/postgrest:latest`
-   - Set environment variables:
-     - `PGRST_DB_URI`: Railway Postgres connection string
-     - `PGRST_DB_ANON_ROLE`: `postgres`
-     - `PGRST_DB_SCHEMA`: `public`
-     - `PGRST_DB_SCHEMAS`: `public`
-     - `PGRST_OPENAPI_SERVER_PROXY_URI`: `${{RAILWAY_PUBLIC_DOMAIN}}`
-   - Enable "Public Networking" to get a public URL
+## API Endpoints
 
-5. **Deploy UI Service**
-   ```bash
-   cd ui
-   railway up
-   ```
+The governance API provides the following endpoints:
 
-   Set environment variables:
-   - `VITE_POSTGREST_URL`: PostgREST public URL from step 4
+### Governance
+- `GET /api/governance/proposals` - List all proposals
+- `GET /api/governance/proposals/:id` - Get proposal details
+- `GET /api/governance/proposals/:id/votes` - Get votes for a proposal
+- `GET /api/governance/proposals/:id/calls` - Get proposal actions
+- `GET /api/governance/delegates` - List all delegates
+- `GET /api/governance/delegates/:address` - Get delegate info
+- `GET /api/governance/delegations/:address` - Get delegation info
+- `GET /api/governance/stats/total-votes` - Get total voting power
+- `GET /api/governance/votes/address/:address` - Get votes by voter address
 
-6. **Configure Networking**
-   - Each service will get its own Railway internal URL
-   - Services can communicate via `servicename.railway.internal`
-   - Enable public domains for PostgREST and UI
+See `api/README.md` for detailed API documentation.
 
-## Alternative: Single Docker Deployment
-
-If you want to run everything in one container on Railway:
-
-1. Use the provided `docker-compose.yml` for local dev
-2. For Railway, create a single Dockerfile that runs docker-compose:
-
-```dockerfile
-FROM docker/compose:latest
-
-WORKDIR /app
-COPY . .
-
-CMD ["docker-compose", "up"]
-```
-
-**Note**: This approach is not recommended as Railway works best with individual services.
+**Note**: Swaps/price data is served by a separate API deployed with the swaps-indexer.
 
 ## Environment Variables
 
-### Indexer
-- `NETWORK`: Starknet network (mainnet/sepolia)
-- `PG_CONNECTION_STRING`: PostgreSQL connection string
-- `APIBARA_URL`: Apibara DNA stream URL
-- `DNA_TOKEN`: Apibara authentication token
-- `GOVERNOR_ADDRESS`: Governor contract address (0x...)
-- `VOTES_TOKEN_ADDRESS`: ERC20Votes token address (0x...)
-- `STARTING_CURSOR_BLOCK_NUMBER`: Block number to start indexing from
-- `LOG_LEVEL`: Log level (debug/info/warn/error)
-- `NO_BLOCKS_TIMEOUT_MS`: Timeout for block streaming (default: 120000)
+See `.env.example` for a complete list of environment variables. Key variables include:
 
-### PostgREST
-- `PGRST_DB_URI`: PostgreSQL connection URI
-- `PGRST_DB_ANON_ROLE`: Database role (postgres)
-- `PGRST_DB_SCHEMA`: Schema to expose (public)
-- `PGRST_OPENAPI_SERVER_PROXY_URI`: Public URL for OpenAPI spec
+### Apibara
+- `DNA_TOKEN`: Apibara authentication token
+- `APIBARA_URL`: Apibara DNA stream URL (default: mainnet.starknet.a5a.ch)
+
+### Governance
+- `GOVERNOR_ADDRESS`: Governor contract address
+- `VOTES_TOKEN_ADDRESS`: ERC20Votes token address
+
+### Indexer
+- `STARTING_CURSOR_BLOCK_NUMBER`: Block to start indexing from (0 = genesis)
+- `NO_BLOCKS_TIMEOUT_MS`: Timeout for block streaming (0 = disabled)
+- `LOG_LEVEL`: Log level (debug/info/warn/error)
+
+### API
+- `PORT`: API server port (default: 4000)
+- `CORS_ORIGIN`: Allowed CORS origin
+- Cache TTLs for different data types
 
 ### UI
-- `VITE_POSTGREST_URL`: PostgREST API URL
+- `VITE_API_URL`: API server URL (default: http://localhost:4000)
 
 ## Project Structure
 
 ```
-governance-stack/
-├── indexer/           # Blockchain indexer
+governance/
+├── indexer/    # Governance events indexer
 │   ├── src/
 │   ├── Dockerfile
 │   └── package.json
-├── ui/               # React frontend
+├── api/        # Custom Express REST API (governance only)
 │   ├── src/
+│   │   ├── routes/
+│   │   │   └── governance.ts  # Governance endpoints
+│   │   ├── db/
+│   │   │   └── governance.ts  # Governance DB pool
+│   │   └── index.ts
 │   ├── Dockerfile
-│   ├── nginx.conf
 │   └── package.json
-├── docker-compose.yml
-├── railway.json
+├── ui/         # React + Vite frontend (deployed separately)
+│   ├── src/
+│   └── package.json
+├── docker-compose.yml     # Local development setup (backend only)
+├── .env.example          # Environment variables template
+├── DEPLOYMENT.md         # Comprehensive deployment guide
 └── README.md
 ```
 
-## Monitoring
+**Note**: `swaps-indexer`, `swaps-api`, and `swaps-db` are maintained in a separate repository.
 
-On Railway dashboard you can:
-- View logs for each service
-- Monitor resource usage
-- Set up alerts
-- View deployment history
+## Testing the API
+
+```bash
+# Health check
+curl http://localhost:4000/health
+
+# Get all proposals
+curl http://localhost:4000/api/governance/proposals | jq
+
+# Get specific proposal
+curl http://localhost:4000/api/governance/proposals/1 | jq
+
+# Get votes for a proposal
+curl http://localhost:4000/api/governance/proposals/1/votes | jq
+
+# Get all delegates
+curl http://localhost:4000/api/governance/delegates | jq
+
+# Get total voting power
+curl http://localhost:4000/api/governance/stats/total-votes | jq
+```
+
+## Development
+
+### Running Individual Services
+
+Each service can be developed and tested independently:
+
+**Governance API:**
+```bash
+cd api
+npm install
+npm run dev  # Runs on port 4000
+```
+
+**Governance Indexer:**
+```bash
+cd indexer
+npm install
+npm run dev
+```
+
+**Governance UI:**
+The UI is maintained in a separate repository/deployment. See that repository's README for local development instructions.
+
+### Database Access
+
+Connect to local governance database:
+
+```bash
+# Governance database
+psql postgresql://postgres:postgres@localhost:5432/mainnet
+```
 
 ## Troubleshooting
 
-### Indexer not syncing
-- Check `APIBARA_URL` and `DNA_TOKEN` are correct
-- Verify `GOVERNOR_ADDRESS` matches your deployed contract
-- Check indexer logs: `railway logs -s indexer`
+### Indexer Not Syncing
 
-### PostgREST schema cache issues
-- PostgREST caches schema on startup
-- If tables/views don't appear, restart the PostgREST service
-- Check postgres connection string is correct
+**Symptoms:** No data appearing in database, indexer logs show errors
 
-### UI can't connect to API
-- Verify `VITE_POSTGREST_URL` points to PostgREST public URL
-- Ensure PostgREST has public networking enabled
-- Check CORS if needed
+**Solutions:**
+- Check `DNA_TOKEN` is valid and not expired
+- Verify contract addresses are correct
+- Ensure `STARTING_CURSOR_BLOCK_NUMBER` is valid
+- Check Apibara service status
 
-## Production Considerations
+```bash
+docker-compose logs indexer
+```
 
-1. **Database**: Use Railway's managed Postgres with regular backups
-2. **Secrets**: Store sensitive values (DNA_TOKEN, connection strings) in Railway environment variables
-3. **Scaling**: Each service can be scaled independently
-4. **Monitoring**: Set up Railway alerts for service health
-5. **Updates**: Use Railway's GitHub integration for automatic deployments
+### API Connection Errors
+
+**Symptoms:** UI can't fetch data, API returns 500 errors
+
+**Solutions:**
+- Verify governance database is running and healthy
+- Check `GOVERNANCE_DB_URL` is correct
+- Ensure governance indexer has populated the governance database
+
+```bash
+docker-compose ps  # Check service status
+docker-compose logs api
+```
+
+### Slow Indexing
+
+**Symptoms:** Governance indexer taking a long time to catch up
+
+**Solutions:**
+- This is expected if starting from genesis
+- Consider setting `STARTING_CURSOR_BLOCK_NUMBER` to a more recent block (e.g., when your governor was deployed)
+- Check database disk space and performance
+- Verify the indexer isn't being rate-limited by Apibara
+
+### Fresh Start
+
+If you need to completely reset and start over:
+
+```bash
+# Stop all services and remove volumes
+docker-compose down -v
+
+# Edit .env if needed
+nano .env
+
+# Start fresh
+docker-compose up -d
+```
+
+## Contributing
+
+When contributing:
+1. Test locally with docker-compose
+2. Ensure all services start successfully
+3. Verify API endpoints return expected data
+4. Check UI displays data correctly
+5. Update documentation for any new features
+
+## License
+
+[Your License Here]
