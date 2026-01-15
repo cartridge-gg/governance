@@ -34,6 +34,8 @@ import {
   Coins,
   ArrowRight,
   Code,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccount, useProvider } from "@starknet-react/core";
@@ -70,6 +72,7 @@ export function ProposalDetail() {
   const [queuedData, setQueuedData] = useState<any>(null);
   const [executedData, setExecutedData] = useState<any>(null);
   const [showAllVoters, setShowAllVoters] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Get addresses of voters and proposer for username lookup
   const allAddresses = useMemo(() => {
@@ -1075,9 +1078,37 @@ export function ProposalDetail() {
           <CardTitle>Description</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="prose prose-invert prose-headings:text-[#FFE97F] prose-headings:font-['Cinzel'] prose-a:text-[#FFE97F] prose-strong:text-white prose-code:text-[#1aff5c] prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:my-1 prose-p:my-3 max-w-none">
+          <div
+            className={cn(
+              "prose prose-invert prose-headings:text-[#FFE97F] prose-headings:font-['Cinzel'] prose-a:text-[#FFE97F] prose-strong:text-white prose-code:text-[#1aff5c] prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:my-1 prose-p:my-3 max-w-none transition-all",
+              !isDescriptionExpanded && "max-h-[200px] overflow-hidden relative"
+            )}
+          >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{descriptionWithoutTitle}</ReactMarkdown>
+            {!isDescriptionExpanded && descriptionWithoutTitle.length > 300 && (
+              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0a0f0d] to-transparent pointer-events-none" />
+            )}
           </div>
+          {descriptionWithoutTitle.length > 300 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+              className="mt-2 w-full text-[#FFE97F] hover:text-[#FFD700] hover:bg-[rgba(255,233,127,0.1)]"
+            >
+              {isDescriptionExpanded ? (
+                <>
+                  <ChevronUp className="mr-2 h-4 w-4" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="mr-2 h-4 w-4" />
+                  Show More
+                </>
+              )}
+            </Button>
+          )}
         </CardContent>
       </Card>
 
