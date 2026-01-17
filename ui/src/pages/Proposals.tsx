@@ -170,7 +170,7 @@ export function Proposals() {
     <div className="space-y-6">
       {/* Header Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2 main-container !p-4 sm:!p-8">
+        <div className="lg:col-span-2 main-container">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-['Cinzel'] font-black text-[#FFE97F] mb-2 sm:mb-3 glow">
             SURVIVOR GOVERNANCE
           </h1>
@@ -188,7 +188,7 @@ export function Proposals() {
         </div>
 
         {/* Stats Card */}
-        <div className="main-container !p-4 sm:!p-8">
+        <div className="main-container">
           <div className="flex flex-row lg:flex-col justify-between lg:justify-start items-center lg:items-stretch text-center lg:text-center gap-4 lg:gap-0">
             <div>
               <div className="text-2xl sm:text-3xl font-['Cinzel'] font-bold text-[#FFE97F] mb-1 sm:mb-2">

@@ -223,7 +223,7 @@ export function DelegatesList({
   };
 
   return (
-    <div className="main-container !p-4 sm:!p-8">
+    <div className="main-container">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-[#FFE97F]" />

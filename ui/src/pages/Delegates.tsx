@@ -102,7 +102,7 @@ export function Delegates() {
     <TooltipProvider>
       <div className="space-y-4 sm:space-y-6">
         {/* Header Section */}
-        <div className="main-container !p-4 sm:!p-8">
+        <div className="main-container">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-['Cinzel'] font-black text-[#FFE97F] mb-2 sm:mb-3 glow">
             DELEGATE POWER
           </h1>
@@ -123,7 +123,7 @@ export function Delegates() {
         </div>
 
         {/* Your Delegation Card */}
-        <div className="main-container !p-4 sm:!p-8">
+        <div className="main-container">
           <div className="flex items-center gap-2 mb-4">
             <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-[#FFE97F]" />
             <h2 className="text-xl sm:text-2xl font-['Cinzel'] font-bold text-white">
@@ -224,12 +224,12 @@ export function Delegates() {
                       DELEGATING
                     </>
                   ) : userDelegate?.toLowerCase() === address?.toLowerCase() ? (
-                    <span className="hidden sm:inline">ALREADY DELEGATED TO YOURSELF</span>
+                    <>
+                      <span className="hidden sm:inline">ALREADY DELEGATED TO YOURSELF</span>
+                      <span className="sm:hidden">SELF-DELEGATED</span>
+                    </>
                   ) : (
                     "DELEGATE TO MYSELF"
-                  )}
-                  {userDelegate?.toLowerCase() === address?.toLowerCase() && (
-                    <span className="sm:hidden">SELF-DELEGATED</span>
                   )}
                 </Button>
               </div>

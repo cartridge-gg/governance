@@ -154,7 +154,7 @@ export function CreateProposal() {
   return (
     <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
       {/* Header Section */}
-      <div className="main-container !p-4 sm:!p-8">
+      <div className="main-container">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-['Cinzel'] font-black text-[#FFE97F] mb-2 sm:mb-3 glow">
           CREATE PROPOSAL
         </h1>
@@ -164,7 +164,7 @@ export function CreateProposal() {
       </div>
 
       {/* Description Section */}
-      <div className="main-container !p-4 sm:!p-8">
+      <div className="main-container">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
           <div className="flex items-center gap-2">
             <Scroll className="h-5 w-5 sm:h-6 sm:w-6 text-[#FFE97F]" />
@@ -229,7 +229,7 @@ Brief overview of what this proposal aims to achieve.`}
       </div>
 
       {/* Execution Calls Section */}
-      <div className="main-container !p-4 sm:!p-8">
+      <div className="main-container">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
           <div className="flex items-center gap-2">
             <Code className="h-5 w-5 sm:h-6 sm:w-6 text-[#FFE97F]" />
@@ -1212,7 +1212,7 @@ Brief overview of what this proposal aims to achieve.`}
       </div>
 
       {/* Preview & Submit Section */}
-      <div className="main-container !p-4 sm:!p-8">
+      <div className="main-container">
         <div className="flex items-center gap-2 mb-4">
           <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-[#FFE97F]" />
           <h2 className="text-xl sm:text-2xl font-['Cinzel'] font-bold text-white">

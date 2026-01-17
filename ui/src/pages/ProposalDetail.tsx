@@ -939,7 +939,7 @@ export function ProposalDetail() {
       </Link>
 
       {/* Header */}
-      <div className="main-container !p-4 sm:!p-8">
+      <div className="main-container">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -1248,7 +1248,7 @@ export function ProposalDetail() {
                             </div>
                           </>
                         ) : (
-                          <div className="font-mono text-xs sm:text-sm text-[#FFE97F]">
+                          <div className="font-mono text-xs sm:text-sm text-[#FFE97F] truncate">
                             {formatAddress(voterAddress)}
                           </div>
                         )}
