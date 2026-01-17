@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-[rgb(8,62,34)] bg-[rgba(10,10,10,0.95)] backdrop-blur-lg shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(255,233,127,0.01)] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[rgba(255,233,127,0.01)] to-transparent pointer-events-none" />
       <div className="container mx-auto px-4 relative">
         <div className="flex h-16 sm:h-20 items-center justify-between">
           <div className="flex items-center space-x-4 sm:space-x-8">
