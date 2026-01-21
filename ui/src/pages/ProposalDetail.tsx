@@ -74,6 +74,8 @@ export function ProposalDetail() {
   const [showAllVoters, setShowAllVoters] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
+  console.log(executedData);
+
   // Get addresses of voters and proposer for username lookup
   const allAddresses = useMemo(() => {
     const addresses: string[] = [];
@@ -100,13 +102,14 @@ export function ProposalDetail() {
 
       try {
         setLoading(true);
-        const [proposalData, callsData, votesData, queuedData, executedData] = await Promise.all([
-          db.getProposalById(id),
-          db.getProposalCalls(id),
-          db.getVotesForProposal(id),
-          db.getProposalQueued(id),
-          db.getProposalExecuted(id),
-        ]);
+        const [proposalData, callsData, votesData, queuedData, executedData] =
+          await Promise.all([
+            db.getProposalById(id),
+            db.getProposalCalls(id),
+            db.getVotesForProposal(id),
+            db.getProposalQueued(id),
+            db.getProposalExecuted(id),
+          ]);
 
         setProposal(proposalData);
         setCalls(callsData);
@@ -129,7 +132,7 @@ export function ProposalDetail() {
         if (address && votesData) {
           const userVoteData = votesData.find(
             (v: any) =>
-              bigintToHex(v.voter).toLowerCase() === address.toLowerCase()
+              bigintToHex(v.voter).toLowerCase() === address.toLowerCase(),
           );
           if (userVoteData) {
             setHasVoted(true);
@@ -236,28 +239,37 @@ export function ProposalDetail() {
       | "succeeded"
       | "failed"
       | "executed"
-      | "quorum_not_met"
+      | "quorum_not_met",
   ) => {
     const variants = {
       active: { className: "badge-lime", icon: Flame, text: "ACTIVE" },
-      succeeded: { className: "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c] hover:bg-[#1aff5c]/30", icon: Trophy, text: "SUCCEEDED" },
+      succeeded: {
+        className:
+          "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c] hover:bg-[#1aff5c]/30",
+        icon: Trophy,
+        text: "SUCCEEDED",
+      },
       failed: {
-        className: "bg-red-900/50 text-red-400 border-red-600 hover:bg-red-900/70",
+        className:
+          "bg-red-900/50 text-red-400 border-red-600 hover:bg-red-900/70",
         icon: XCircle,
         text: "FAILED",
       },
       quorum_not_met: {
-        className: "bg-red-900/50 text-red-400 border-red-600 hover:bg-red-900/70",
+        className:
+          "bg-red-900/50 text-red-400 border-red-600 hover:bg-red-900/70",
         icon: XCircle,
         text: "QUORUM NOT REACHED",
       },
       pending: {
-        className: "bg-gray-800/50 text-gray-400 border-gray-600 hover:bg-gray-800/70",
+        className:
+          "bg-gray-800/50 text-gray-400 border-gray-600 hover:bg-gray-800/70",
         icon: Clock,
         text: "PENDING",
       },
       executed: {
-        className: "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c] hover:bg-[#1aff5c]/30",
+        className:
+          "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c] hover:bg-[#1aff5c]/30",
         icon: CheckCircle2,
         text: "EXECUTED",
       },
@@ -268,7 +280,10 @@ export function ProposalDetail() {
 
     return (
       <Badge
-        className={cn("flex items-center gap-1 px-2 py-1 transition-colors", config.className)}
+        className={cn(
+          "flex items-center gap-1 px-2 py-1 transition-colors",
+          config.className,
+        )}
       >
         <Icon className="h-3 w-3" />
         {config.text}
@@ -354,8 +369,13 @@ export function ProposalDetail() {
         address: GOVERNOR_ADDRESS,
         providerOrAccount: provider,
       });
-      const dummyCall = governorContract.populate("propose", [[], proposal.description]);
-      const calldataArray = Array.isArray(dummyCall.calldata) ? dummyCall.calldata : [];
+      const dummyCall = governorContract.populate("propose", [
+        [],
+        proposal.description,
+      ]);
+      const calldataArray = Array.isArray(dummyCall.calldata)
+        ? dummyCall.calldata
+        : [];
       const serializedDescription = calldataArray.slice(1).map(String); // Skip the first element and convert to strings
       const descriptionHash = hash.computeHashOnElements(serializedDescription);
 
@@ -411,8 +431,13 @@ export function ProposalDetail() {
         address: GOVERNOR_ADDRESS,
         providerOrAccount: provider,
       });
-      const dummyCall = governorContract.populate("propose", [[], proposal.description]);
-      const calldataArray = Array.isArray(dummyCall.calldata) ? dummyCall.calldata : [];
+      const dummyCall = governorContract.populate("propose", [
+        [],
+        proposal.description,
+      ]);
+      const calldataArray = Array.isArray(dummyCall.calldata)
+        ? dummyCall.calldata
+        : [];
       const serializedDescription = calldataArray.slice(1).map(String); // Skip the first element and convert to strings
       const descriptionHash = hash.computeHashOnElements(serializedDescription);
 
@@ -475,7 +500,7 @@ export function ProposalDetail() {
       .replace(/^0x0+/, "0x");
     const targetSelector = TRANSFER_SELECTOR.toLowerCase().replace(
       /^0x0+/,
-      "0x"
+      "0x",
     );
     return selector === targetSelector;
   };
@@ -487,7 +512,7 @@ export function ProposalDetail() {
       .replace(/^0x0+/, "0x");
     const targetSelector = APPROVE_SELECTOR.toLowerCase().replace(
       /^0x0+/,
-      "0x"
+      "0x",
     );
     return selector === targetSelector;
   };
@@ -500,7 +525,7 @@ export function ProposalDetail() {
 
     const normalizedAddress = normalizeAddress(address);
     const token = mainnetTokens.find(
-      (t) => normalizeAddress(t.l2_token_address) === normalizedAddress
+      (t) => normalizeAddress(t.l2_token_address) === normalizedAddress,
     );
 
     if (token) {
@@ -573,7 +598,7 @@ export function ProposalDetail() {
     const formattedAmount = formatTokenAmount(
       amount,
       tokenInfo.decimals,
-      tokenInfo.decimals === 6 ? 6 : 2
+      tokenInfo.decimals === 6 ? 6 : 2,
     );
 
     return (
@@ -733,7 +758,7 @@ export function ProposalDetail() {
       : formatTokenAmount(
           amount,
           tokenInfo.decimals,
-          tokenInfo.decimals === 6 ? 6 : 2
+          tokenInfo.decimals === 6 ? 6 : 2,
         );
 
     return (
@@ -1037,7 +1062,7 @@ export function ProposalDetail() {
                     const quorumPercentage =
                       (Number(totalVotes) / Number(quorumRequired)) * 100;
                     return `${quorumPercentage.toFixed(2)}% (${formatVotes(
-                      quorumRequired
+                      quorumRequired,
                     )} required)`;
                   })()
                 : "--"}
@@ -1081,10 +1106,13 @@ export function ProposalDetail() {
           <div
             className={cn(
               "prose prose-invert prose-headings:text-[#FFE97F] prose-headings:font-['Cinzel'] prose-a:text-[#FFE97F] prose-strong:text-white prose-code:text-[#1aff5c] prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:my-1 prose-p:my-3 max-w-none transition-all",
-              !isDescriptionExpanded && "max-h-[200px] overflow-hidden relative"
+              !isDescriptionExpanded &&
+                "max-h-[200px] overflow-hidden relative",
             )}
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{descriptionWithoutTitle}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {descriptionWithoutTitle}
+            </ReactMarkdown>
             {!isDescriptionExpanded && descriptionWithoutTitle.length > 300 && (
               <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#0a0f0d] to-transparent pointer-events-none" />
             )}
@@ -1130,7 +1158,10 @@ export function ProposalDetail() {
                 <div className="flex-1 space-y-3">
                   <div>
                     <div className="text-[#1aff5c] font-bold mb-1">
-                      Executed on {new Date(executedData.block_time).toLocaleDateString()} at {new Date(executedData.block_time).toLocaleTimeString()}
+                      Executed on{" "}
+                      {new Date(executedData.block_time).toLocaleDateString()}{" "}
+                      at{" "}
+                      {new Date(executedData.block_time).toLocaleTimeString()}
                     </div>
                     <div className="text-sm text-gray-400">
                       Block #{executedData.block_number}
@@ -1145,7 +1176,11 @@ export function ProposalDetail() {
                         {executedData.transaction_hash_hex}
                       </code>
                       <button
-                        onClick={() => navigator.clipboard.writeText(executedData.transaction_hash_hex)}
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            executedData.transaction_hash_hex,
+                          )
+                        }
                         className="flex-shrink-0 p-1 hover:bg-[rgba(26,255,92,0.1)] rounded transition-colors"
                         title="Copy transaction hash"
                       >
@@ -1194,8 +1229,8 @@ export function ProposalDetail() {
             isTransferCall(call)
               ? renderTransferCall(call, index)
               : isApprovalCall(call)
-              ? renderApprovalCall(call, index)
-              : renderGenericCall(call, index)
+                ? renderApprovalCall(call, index)
+                : renderGenericCall(call, index),
           )}
         </CardContent>
       </Card>
@@ -1215,64 +1250,66 @@ export function ProposalDetail() {
                 <p>No votes cast yet</p>
               </div>
             ) : (
-              (showAllVoters ? votes : votes.slice(0, 10)).map((vote, index) => {
-                const voterAddress = bigintToHex(vote.voter);
-                const voterProfile = getDelegateProfile(voterAddress);
-                const cartridgeUsername = usernames?.get(
-                  voterAddress.toLowerCase()
-                );
+              (showAllVoters ? votes : votes.slice(0, 10)).map(
+                (vote, index) => {
+                  const voterAddress = bigintToHex(vote.voter);
+                  const voterProfile = getDelegateProfile(voterAddress);
+                  const cartridgeUsername = usernames?.get(
+                    voterAddress.toLowerCase(),
+                  );
 
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 border border-[rgb(8,62,34)] rounded-lg p-3"
-                  >
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <img
-                        src={voterProfile?.avatar || "/avatars/adventurer.png"}
-                        alt={
-                          cartridgeUsername ||
-                          voterProfile?.name ||
-                          "Voter"
-                        }
-                        className="h-8 w-8 sm:h-10 sm:w-10 rounded-full border border-[#FFE97F]/30"
-                      />
-                      <div className="flex flex-col min-w-0">
-                        {cartridgeUsername || voterProfile?.name ? (
-                          <>
-                            <div className="text-sm sm:text-base font-['Cinzel'] font-bold text-white truncate">
-                              {cartridgeUsername || voterProfile?.name}
-                            </div>
-                            <div className="text-xs font-mono text-gray-500 hidden sm:block">
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 border border-[rgb(8,62,34)] rounded-lg p-3"
+                    >
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <img
+                          src={
+                            voterProfile?.avatar || "/avatars/adventurer.png"
+                          }
+                          alt={
+                            cartridgeUsername || voterProfile?.name || "Voter"
+                          }
+                          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full border border-[#FFE97F]/30"
+                        />
+                        <div className="flex flex-col min-w-0">
+                          {cartridgeUsername || voterProfile?.name ? (
+                            <>
+                              <div className="text-sm sm:text-base font-['Cinzel'] font-bold text-white truncate">
+                                {cartridgeUsername || voterProfile?.name}
+                              </div>
+                              <div className="text-xs font-mono text-gray-500 hidden sm:block">
+                                {formatAddress(voterAddress)}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="font-mono text-xs sm:text-sm text-[#FFE97F] truncate">
                               {formatAddress(voterAddress)}
                             </div>
-                          </>
-                        ) : (
-                          <div className="font-mono text-xs sm:text-sm text-[#FFE97F] truncate">
-                            {formatAddress(voterAddress)}
-                          </div>
+                          )}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-400 ml-auto sm:ml-2 whitespace-nowrap">
+                          {formatVotingPower(vote.weight)} votes
+                        </div>
+                      </div>
+                      <Badge
+                        className={cn(
+                          "self-end sm:self-auto",
+                          vote.support === VoteType.For &&
+                            "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c]",
+                          vote.support === VoteType.Against &&
+                            "bg-red-900/50 text-red-400 border-red-600",
+                          vote.support === VoteType.Abstain &&
+                            "bg-gray-800/50 text-gray-400 border-gray-600",
                         )}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-400 ml-auto sm:ml-2 whitespace-nowrap">
-                        {formatVotingPower(vote.weight)} votes
-                      </div>
+                      >
+                        {getVoteTypeLabel(vote.support)}
+                      </Badge>
                     </div>
-                    <Badge
-                      className={cn(
-                        "self-end sm:self-auto",
-                        vote.support === VoteType.For &&
-                          "bg-[#1aff5c]/20 text-[#1aff5c] border-[#1aff5c]",
-                        vote.support === VoteType.Against &&
-                          "bg-red-900/50 text-red-400 border-red-600",
-                        vote.support === VoteType.Abstain &&
-                          "bg-gray-800/50 text-gray-400 border-gray-600"
-                      )}
-                    >
-                      {getVoteTypeLabel(vote.support)}
-                    </Badge>
-                  </div>
-                );
-              })
+                  );
+                },
+              )
             )}
             {votes.length > 10 && (
               <div className="pt-4 text-center">
@@ -1281,7 +1318,9 @@ export function ProposalDetail() {
                   onClick={() => setShowAllVoters(!showAllVoters)}
                   className="border-[#FFE97F] text-[#FFE97F] hover:bg-[rgba(255,233,127,0.1)]"
                 >
-                  {showAllVoters ? "Show Less" : `Show All (${votes.length} voters)`}
+                  {showAllVoters
+                    ? "Show Less"
+                    : `Show All (${votes.length} voters)`}
                 </Button>
               </div>
             )}
@@ -1298,10 +1337,10 @@ export function ProposalDetail() {
               {!isConnected
                 ? "Connect your wallet to vote"
                 : hasVoted
-                ? `You have already voted: ${getVoteTypeLabel(userVote!)}`
-                : votingPowerAtSnapshot === "0"
-                ? "You have no voting power for this proposal"
-                : `Your voting power (at proposal creation): ${votingPowerAtSnapshot}`}
+                  ? `You have already voted: ${getVoteTypeLabel(userVote!)}`
+                  : votingPowerAtSnapshot === "0"
+                    ? "You have no voting power for this proposal"
+                    : `Your voting power (at proposal creation): ${votingPowerAtSnapshot}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -1354,7 +1393,7 @@ export function ProposalDetail() {
                       "h-16 sm:h-20 flex flex-col items-center justify-center gap-1 sm:gap-2",
                       selectedVote === VoteType.For
                         ? "bg-[#1aff5c]/20 text-[#1aff5c] border-2 border-[#1aff5c]"
-                        : "btn-gold-outline"
+                        : "btn-gold-outline",
                     )}
                     onClick={() => handleVote(VoteType.For)}
                     disabled={isVoting || selectedVote !== null}
@@ -1369,7 +1408,7 @@ export function ProposalDetail() {
                       "h-16 sm:h-20 flex flex-col items-center justify-center gap-1 sm:gap-2",
                       selectedVote === VoteType.Against
                         ? "bg-red-900/50 text-red-400 border-2 border-red-600"
-                        : "btn-gold-outline"
+                        : "btn-gold-outline",
                     )}
                     onClick={() => handleVote(VoteType.Against)}
                     disabled={isVoting || selectedVote !== null}
@@ -1384,7 +1423,7 @@ export function ProposalDetail() {
                       "h-16 sm:h-20 flex flex-col items-center justify-center gap-1 sm:gap-2",
                       selectedVote === VoteType.Abstain
                         ? "bg-gray-800/50 text-gray-400 border-2 border-gray-600"
-                        : "btn-gold-outline"
+                        : "btn-gold-outline",
                     )}
                     onClick={() => handleVote(VoteType.Abstain)}
                     disabled={isVoting || selectedVote !== null}
@@ -1464,26 +1503,31 @@ export function ProposalDetail() {
                   You need to connect your wallet to execute this proposal
                 </p>
               </div>
-            ) : (() => {
-              const now = Math.floor(Date.now() / 1000);
-              const eta = parseInt(queuedData.eta_seconds);
-              const canExecute = now >= eta;
+            ) : (
+              (() => {
+                const now = Math.floor(Date.now() / 1000);
+                const eta = parseInt(queuedData.eta_seconds);
+                const canExecute = now >= eta;
 
-              return (
-                <Button
-                  className="w-full btn-gold text-lg py-6"
-                  onClick={handleExecute}
-                  disabled={isExecuting || !canExecute}
-                >
-                  <CheckCircle2 className="mr-2 h-5 w-5" />
-                  {isExecuting ? "EXECUTING..." : canExecute ? "EXECUTE PROPOSAL" : "WAITING FOR TIMELOCK"}
-                </Button>
-              );
-            })()}
+                return (
+                  <Button
+                    className="w-full btn-gold text-lg py-6"
+                    onClick={handleExecute}
+                    disabled={isExecuting || !canExecute}
+                  >
+                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                    {isExecuting
+                      ? "EXECUTING..."
+                      : canExecute
+                        ? "EXECUTE PROPOSAL"
+                        : "WAITING FOR TIMELOCK"}
+                  </Button>
+                );
+              })()
+            )}
           </CardContent>
         </Card>
       )}
-
     </div>
   );
 }

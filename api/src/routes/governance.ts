@@ -451,10 +451,15 @@ router.get('/proposals/:id/executed', async (req, res, next) => {
 
     const result = await governancePool.query(`
       SELECT
-        event_id,
-        proposal_id::TEXT
-      FROM proposal_executed
-      WHERE proposal_id::TEXT = $1
+        pe.event_id,
+        pe.proposal_id::TEXT,
+        ek.transaction_hash,
+        ek.block_number,
+        b.time as block_time
+      FROM proposal_executed pe
+      INNER JOIN event_keys ek ON pe.event_id = ek.id
+      INNER JOIN blocks b ON ek.block_number = b.number
+      WHERE pe.proposal_id::TEXT = $1
     `, [proposalId]);
 
     if (result.rows.length === 0) {
@@ -465,6 +470,7 @@ router.get('/proposals/:id/executed', async (req, res, next) => {
     const row = {
       ...result.rows[0],
       proposal_id_hex: numericToHex(result.rows[0].proposal_id),
+      transaction_hash_hex: result.rows[0].transaction_hash,
     };
 
     setCache(cacheKey, row);

@@ -113,6 +113,10 @@ export async function getProposalExecuted(proposalId: string) {
       event_id: string;
       proposal_id: string;
       proposal_id_hex: string;
+      transaction_hash: string;
+      transaction_hash_hex: string;
+      block_number: number;
+      block_time: string;
     }>(`/api/governance/proposals/${proposalId}/executed`);
   } catch (error) {
     // Return null if proposal hasn't been executed (404)
