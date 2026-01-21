@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import * as db from "@/lib/db";
 import { useToken } from "@/hooks/useToken";
 import { ProposalCard } from "@/components/ProposalCard";
+import { HIDDEN_PROPOSAL_IDS } from "@/lib/constants";
 
 interface Proposal {
   id: string;
@@ -144,6 +145,9 @@ export function Proposals() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Filter out hidden proposals
+  const filteredProposals = proposals.filter((p) => !HIDDEN_PROPOSAL_IDS.includes(p.id));
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -191,7 +195,7 @@ export function Proposals() {
         <div className="main-container">
           <div className="text-center">
             <div className="text-3xl font-['Cinzel'] font-bold text-[#FFE97F] mb-2">
-              {proposals.length}
+              {filteredProposals.length}
             </div>
             <div className="text-sm text-gray-400 uppercase tracking-wider">
               Total Proposals
@@ -200,13 +204,13 @@ export function Proposals() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500 uppercase tracking-wider">Active</span>
                 <span className="text-xl font-['Cinzel'] font-bold text-[#1aff5c]">
-                  {proposals.filter((p) => p.status === "active").length}
+                  {filteredProposals.filter((p) => p.status === "active").length}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500 uppercase tracking-wider">Passed</span>
                 <span className="text-xl font-['Cinzel'] font-bold text-[#FFE97F]">
-                  {proposals.filter((p) => p.status === "succeeded" || p.status === "executed").length}
+                  {filteredProposals.filter((p) => p.status === "succeeded" || p.status === "executed").length}
                 </span>
               </div>
             </div>
@@ -246,7 +250,7 @@ export function Proposals() {
 
           <div className="p-6">
             <TabsContent value="all" className="mt-0">
-              {proposals.length === 0 ? (
+              {filteredProposals.length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Shield className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No proposals yet</p>
@@ -256,7 +260,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals.map((proposal) => (
+                  {filteredProposals.map((proposal) => (
                     <ProposalCard key={proposal.id} proposal={proposal} />
                   ))}
                 </div>
@@ -264,7 +268,7 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="active" className="mt-0">
-              {proposals.filter((p) => p.status === "active").length === 0 ? (
+              {filteredProposals.filter((p) => p.status === "active").length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Shield className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No active proposals</p>
@@ -274,7 +278,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
+                  {filteredProposals
                     .filter((p) => p.status === "active")
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />
@@ -284,7 +288,7 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="passed" className="mt-0">
-              {proposals.filter((p) => p.status === "succeeded" || p.status === "executed").length ===
+              {filteredProposals.filter((p) => p.status === "succeeded" || p.status === "executed").length ===
               0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-600" />
@@ -295,7 +299,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
+                  {filteredProposals
                     .filter((p) => p.status === "succeeded" || p.status === "executed")
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />
@@ -305,7 +309,7 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="failed" className="mt-0">
-              {proposals.filter((p) => p.status === "failed" || p.status === "quorum_not_met").length === 0 ? (
+              {filteredProposals.filter((p) => p.status === "failed" || p.status === "quorum_not_met").length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <XCircle className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No failed proposals</p>
@@ -315,7 +319,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
+                  {filteredProposals
                     .filter((p) => p.status === "failed" || p.status === "quorum_not_met")
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />

@@ -4,6 +4,7 @@ import { Proposals } from "@/pages/Proposals";
 import { ProposalDetail } from "@/pages/ProposalDetail";
 import { Delegates } from "@/pages/Delegates";
 import { CreateProposal } from "@/pages/CreateProposal";
+import { Treasury } from "@/pages/Treasury";
 import {
   StarknetConfig,
   jsonRpcProvider,
@@ -55,6 +56,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Proposals />} />
             <Route path="proposal/:id" element={<ProposalDetail />} />
+            <Route path="treasury" element={<Treasury />} />
             <Route path="delegates" element={<Delegates />} />
             <Route path="create" element={<CreateProposal />} />
           </Route>

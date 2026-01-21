@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wallet, LogOut, Vote, Users, Scroll } from "lucide-react";
+import { Wallet, LogOut, Vote, Users, Scroll, Vault } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccount, useDisconnect } from "@starknet-react/core";
 import { WalletModal } from "@/components/WalletModal";
@@ -26,6 +26,7 @@ export function Header() {
     { name: "Proposals", href: "/", icon: Vote },
     { name: "Delegates", href: "/delegates", icon: Users },
     { name: "Create Proposal", href: "/create", icon: Scroll },
+    { name: "Treasury", href: "/treasury", icon: Vault },
   ];
 
   return (
@@ -55,7 +56,7 @@ export function Header() {
                       "hover:transform hover:-translate-y-0.5",
                       isActive
                         ? "bg-[rgba(255,233,127,0.15)] text-[#FFE97F] shadow-[0_0_20px_rgba(255,233,127,0.3)]"
-                        : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]"
+                        : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]",
                     )}
                   >
                     <Icon className="h-4 w-4" />
