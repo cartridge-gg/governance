@@ -2,7 +2,7 @@ import { Wallet, RefreshCw, ExternalLink, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useVoyagerTokenBalances } from "@/hooks/useVoyagerTokenBalances";
 import { useEkuboPrices } from "@/hooks/useEkuboPrice";
-import { DAO_TREASURY_ADDRESS } from "@/lib/constants";
+import { DAO_TREASURY_ADDRESS, TOKEN_ADDRESS, GOVERNANCE_TOKEN_INITIAL_ALLOCATION } from "@/lib/constants";
 import { bigintToHex } from "@/lib/utils";
 import { useMemo } from "react";
 import { TreasuryPieChart } from "@/components/TreasuryPieChart";
@@ -66,9 +66,55 @@ export function Treasury() {
     });
   }, [balances, ekuboPrices]);
 
-  // Filter out assets with less than $1 in value and sort by USD value descending
+  // Split governance token into initial allocation and buybacks, then filter and sort
   const significantBalances = useMemo(() => {
-    return enrichedBalances
+    const normalizedTokenAddress = addAddressPadding(TOKEN_ADDRESS).toLowerCase();
+
+    const balancesWithSplit = enrichedBalances.flatMap((balance) => {
+      // Check if this is the governance token
+      const isGovernanceToken =
+        addAddressPadding(balance.tokenAddress).toLowerCase() === normalizedTokenAddress;
+
+      if (!isGovernanceToken) {
+        return [balance];
+      }
+
+      // Split governance token into initial allocation and buybacks
+      const totalBalance = BigInt(balance.balance);
+      const divisor = BigInt(10 ** balance.decimals);
+      const totalTokens = Number(totalBalance) / Number(divisor);
+
+      const initialAllocation = GOVERNANCE_TOKEN_INITIAL_ALLOCATION;
+      const buybacks = Math.max(0, totalTokens - initialAllocation);
+
+      // Calculate balances and USD values for each part
+      const pricePerToken = balance.usdBalance ? balance.usdBalance / totalTokens : 0;
+      const initialAllocationBalance = BigInt(initialAllocation * (10 ** balance.decimals));
+      const buybacksBalance = totalBalance - initialAllocationBalance;
+
+      return [
+        {
+          ...balance,
+          name: `${balance.symbol || balance.name} - Initial Allocation`,
+          symbol: balance.symbol,
+          balance: initialAllocationBalance.toString(),
+          usdBalance: initialAllocation * pricePerToken,
+          _splitType: 'initial' as const,
+          _customColor: '#4AFF8C', // Lighter green for initial allocation
+        },
+        {
+          ...balance,
+          name: `${balance.symbol || balance.name} - Buybacks`,
+          symbol: balance.symbol,
+          balance: buybacksBalance.toString(),
+          usdBalance: buybacks * pricePerToken,
+          _splitType: 'buybacks' as const,
+          _customColor: '#1aff5c', // Bright green for buybacks
+        },
+      ];
+    });
+
+    return balancesWithSplit
       .filter((balance) => balance.usdBalance && balance.usdBalance >= 1)
       .sort((a, b) => (b.usdBalance || 0) - (a.usdBalance || 0));
   }, [enrichedBalances]);
@@ -81,12 +127,12 @@ export function Treasury() {
   // Prepare data for pie chart
   const pieChartData = useMemo(() => {
     return significantBalances
-      .map((balance) => ({
+      .map((balance: any) => ({
         label: balance.name || balance.symbol || "Unknown",
         value: balance.usdBalance!,
         symbol: balance.symbol,
         logo: balance.logo,
-        color: "", // Will use default colors
+        color: balance._customColor || "", // Use custom color if provided, otherwise use default colors
       }))
       .sort((a, b) => b.value - a.value); // Sort by value descending
   }, [significantBalances]);
@@ -391,13 +437,17 @@ export function Treasury() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-lg font-['Cinzel'] font-bold text-[#FFE97F]">
-                          {balance.symbol || "Unknown"}
+                          {(balance as any)._splitType
+                            ? balance.name
+                            : balance.symbol || "Unknown"}
                         </span>
-                        {balance.name && balance.name !== balance.symbol && (
-                          <span className="hidden sm:inline text-sm text-gray-400">
-                            {balance.name}
-                          </span>
-                        )}
+                        {balance.name &&
+                          balance.name !== balance.symbol &&
+                          !(balance as any)._splitType && (
+                            <span className="hidden sm:inline text-sm text-gray-400">
+                              {balance.name}
+                            </span>
+                          )}
                       </div>
                       <a
                         href={`https://voyager.online/contract/${bigintToHex(balance.tokenAddress)}`}

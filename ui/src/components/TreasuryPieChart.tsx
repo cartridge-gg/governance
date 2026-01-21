@@ -278,7 +278,7 @@ export function TreasuryPieChart({ data }: TreasuryPieChartProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-[#FFE97F] truncate">
-                      {segment.symbol || segment.label}
+                      {segment.label}
                     </span>
                     <span className="text-xs text-gray-400">
                       {segment.percentage.toFixed(1)}%
