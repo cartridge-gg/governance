@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wallet, LogOut, Vote, Users, Scroll, Menu, X } from "lucide-react";
+import {
+  Wallet,
+  LogOut,
+  Vote,
+  Users,
+  Scroll,
+  Menu,
+  X,
+  Vault,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccount, useDisconnect } from "@starknet-react/core";
 import { WalletModal } from "@/components/WalletModal";
@@ -27,6 +36,7 @@ export function Header() {
     { name: "Proposals", href: "/", icon: Vote },
     { name: "Delegates", href: "/delegates", icon: Users },
     { name: "Create Proposal", href: "/create", icon: Scroll },
+    { name: "Treasury", href: "/treasury", icon: Vault },
   ];
 
   return (
@@ -56,7 +66,7 @@ export function Header() {
                       "hover:transform hover:-translate-y-0.5",
                       isActive
                         ? "bg-[rgba(255,233,127,0.15)] text-[#FFE97F] shadow-[0_0_20px_rgba(255,233,127,0.3)]"
-                        : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]"
+                        : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]",
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -108,7 +118,11 @@ export function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
       </div>
@@ -129,7 +143,7 @@ export function Header() {
                     "flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200",
                     isActive
                       ? "bg-[rgba(255,233,127,0.15)] text-[#FFE97F]"
-                      : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]"
+                      : "text-gray-400 hover:text-[#FFE97F] hover:bg-[rgba(255,233,127,0.08)]",
                   )}
                 >
                   <Icon className="h-5 w-5" />

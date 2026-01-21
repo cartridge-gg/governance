@@ -9,12 +9,19 @@ import { useState, useEffect } from "react";
 import * as db from "@/lib/db";
 import { useToken } from "@/hooks/useToken";
 import { ProposalCard } from "@/components/ProposalCard";
+import { HIDDEN_PROPOSAL_IDS } from "@/lib/constants";
 
 interface Proposal {
   id: string;
   title: string;
   description: string;
-  status: "active" | "succeeded" | "failed" | "pending" | "executed" | "quorum_not_met";
+  status:
+    | "active"
+    | "succeeded"
+    | "failed"
+    | "pending"
+    | "executed"
+    | "quorum_not_met";
   votesFor: string;
   votesAgainst: string;
   votesAbstain: string;
@@ -60,7 +67,7 @@ export function Proposals() {
             let againstTotal = 0n;
             let abstainTotal = 0n;
 
-            votes.forEach(vote => {
+            votes.forEach((vote) => {
               const weight = BigInt(vote.weight);
               if (vote.support === 1) {
                 forTotal += weight;
@@ -96,7 +103,7 @@ export function Proposals() {
             } catch (err) {
               console.error(
                 `Failed to determine status for proposal ${p.proposal_id}:`,
-                err
+                err,
               );
               // Use utility with zero supply to get default behavior
               status = determineProposalStatus({
@@ -128,7 +135,7 @@ export function Proposals() {
               proposer: bigintToHex(p.proposer),
               executedTime: executedData ? new Date() : undefined,
             };
-          })
+          }),
         );
 
         setProposals(transformed);
@@ -143,6 +150,11 @@ export function Proposals() {
     fetchProposals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Filter out hidden proposals
+  const filteredProposals = proposals.filter(
+    (p) => !HIDDEN_PROPOSAL_IDS.includes(p.id),
+  );
 
   if (loading) {
     return (
@@ -192,7 +204,7 @@ export function Proposals() {
           <div className="flex flex-row lg:flex-col justify-between lg:justify-start items-center lg:items-stretch text-center lg:text-center gap-4 lg:gap-0">
             <div>
               <div className="text-2xl sm:text-3xl font-['Cinzel'] font-bold text-[#FFE97F] mb-1 sm:mb-2">
-                {proposals.length}
+                {filteredProposals.length}
               </div>
               <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider">
                 Total Proposals
@@ -200,15 +212,27 @@ export function Proposals() {
             </div>
             <div className="flex flex-row lg:flex-col gap-4 lg:gap-0 lg:mt-4 lg:space-y-3">
               <div className="flex flex-col lg:flex-row justify-between items-center lg:items-center gap-1 lg:gap-0">
-                <span className="text-xs text-gray-500 uppercase tracking-wider">Active</span>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">
+                  Active
+                </span>
                 <span className="text-lg sm:text-xl font-['Cinzel'] font-bold text-[#1aff5c]">
-                  {proposals.filter((p) => p.status === "active").length}
+                  {
+                    filteredProposals.filter((p) => p.status === "active")
+                      .length
+                  }
                 </span>
               </div>
               <div className="flex flex-col lg:flex-row justify-between items-center lg:items-center gap-1 lg:gap-0">
-                <span className="text-xs text-gray-500 uppercase tracking-wider">Passed</span>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">
+                  Passed
+                </span>
                 <span className="text-lg sm:text-xl font-['Cinzel'] font-bold text-[#FFE97F]">
-                  {proposals.filter((p) => p.status === "succeeded" || p.status === "executed").length}
+                  {
+                    filteredProposals.filter(
+                      (p) =>
+                        p.status === "succeeded" || p.status === "executed",
+                    ).length
+                  }
                 </span>
               </div>
             </div>
@@ -248,7 +272,7 @@ export function Proposals() {
 
           <div className="p-4 sm:p-6">
             <TabsContent value="all" className="mt-0">
-              {proposals.length === 0 ? (
+              {filteredProposals.length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Shield className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No proposals yet</p>
@@ -258,7 +282,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals.map((proposal) => (
+                  {filteredProposals.map((proposal) => (
                     <ProposalCard key={proposal.id} proposal={proposal} />
                   ))}
                 </div>
@@ -266,7 +290,8 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="active" className="mt-0">
-              {proposals.filter((p) => p.status === "active").length === 0 ? (
+              {filteredProposals.filter((p) => p.status === "active").length ===
+              0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Shield className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No active proposals</p>
@@ -276,7 +301,7 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
+                  {filteredProposals
                     .filter((p) => p.status === "active")
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />
@@ -286,8 +311,9 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="passed" className="mt-0">
-              {proposals.filter((p) => p.status === "succeeded" || p.status === "executed").length ===
-              0 ? (
+              {filteredProposals.filter(
+                (p) => p.status === "succeeded" || p.status === "executed",
+              ).length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No passed proposals</p>
@@ -297,8 +323,11 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
-                    .filter((p) => p.status === "succeeded" || p.status === "executed")
+                  {filteredProposals
+                    .filter(
+                      (p) =>
+                        p.status === "succeeded" || p.status === "executed",
+                    )
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />
                     ))}
@@ -307,7 +336,9 @@ export function Proposals() {
             </TabsContent>
 
             <TabsContent value="failed" className="mt-0">
-              {proposals.filter((p) => p.status === "failed" || p.status === "quorum_not_met").length === 0 ? (
+              {filteredProposals.filter(
+                (p) => p.status === "failed" || p.status === "quorum_not_met",
+              ).length === 0 ? (
                 <div className="text-center text-gray-500 py-12">
                   <XCircle className="h-12 w-12 mx-auto mb-3 text-gray-600" />
                   <p className="font-['Cinzel'] text-lg">No failed proposals</p>
@@ -317,8 +348,11 @@ export function Proposals() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {proposals
-                    .filter((p) => p.status === "failed" || p.status === "quorum_not_met")
+                  {filteredProposals
+                    .filter(
+                      (p) =>
+                        p.status === "failed" || p.status === "quorum_not_met",
+                    )
                     .map((proposal) => (
                       <ProposalCard key={proposal.id} proposal={proposal} />
                     ))}
