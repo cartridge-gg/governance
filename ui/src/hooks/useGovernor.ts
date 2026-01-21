@@ -1,4 +1,4 @@
-import { Contract, hash } from "starknet";
+import { Contract } from "starknet";
 import { useAccount, useProvider } from "@starknet-react/core";
 import GOVERNOR_ABI from "@/lib/abis/governor";
 import { type Call } from "starknet";
@@ -54,9 +54,10 @@ export function useGovernor() {
       // Transform Starknet.js Call format to Cairo Call format
       // Starknet.js uses: { contractAddress, entrypoint, calldata }
       // Cairo expects: { to, selector, calldata }
+      // Note: entrypoint should already be a hashed selector from manual entry or raw calldata
       const transformedCalls = calls.map((call) => ({
         to: call.contractAddress,
-        selector: hash.getSelectorFromName(call.entrypoint),
+        selector: call.entrypoint, // Already a hex selector
         calldata: call.calldata || [],
       }));
 
@@ -125,14 +126,10 @@ export function useGovernor() {
 
     try {
       // Transform Starknet.js Call format to Cairo Call format
-      // If entrypoint looks like a hex selector (starts with 0x and is long), use it directly
-      // Otherwise compute the selector from the entrypoint name
+      // Note: entrypoint should already be a hashed selector
       const transformedCalls = calls.map((call) => ({
         to: call.contractAddress,
-        selector:
-          call.entrypoint.startsWith("0x") && call.entrypoint.length > 20
-            ? call.entrypoint
-            : hash.getSelectorFromName(call.entrypoint),
+        selector: call.entrypoint, // Already a hex selector
         calldata: call.calldata || [],
       }));
 
@@ -168,14 +165,10 @@ export function useGovernor() {
 
     try {
       // Transform Starknet.js Call format to Cairo Call format
-      // If entrypoint looks like a hex selector (starts with 0x and is long), use it directly
-      // Otherwise compute the selector from the entrypoint name
+      // Note: entrypoint should already be a hashed selector
       const transformedCalls = calls.map((call) => ({
         to: call.contractAddress,
-        selector:
-          call.entrypoint.startsWith("0x") && call.entrypoint.length > 20
-            ? call.entrypoint
-            : hash.getSelectorFromName(call.entrypoint),
+        selector: call.entrypoint, // Already a hex selector
         calldata: call.calldata || [],
       }));
 

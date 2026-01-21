@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useGovernor } from "@/hooks/useGovernor";
 import { useConfetti } from "@/hooks/useConfetti";
-import { type Call } from "starknet";
+import { type Call, hash } from "starknet";
 import { GOVERNANCE_PARAMS } from "@/lib/constants";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -76,11 +76,14 @@ export function CreateProposal() {
             .filter((v) => v);
         }
 
+        // Hash the entrypoint name to get the selector for manual entry
+        const selector = hash.getSelectorFromName(newCall.entrypoint);
+
         setCalls([
           ...calls,
           {
             contractAddress: newCall.contractAddress,
-            entrypoint: newCall.entrypoint,
+            entrypoint: selector, // Store the hashed selector
             calldata: parsedCalldata,
           },
         ]);
