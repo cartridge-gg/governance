@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mainnet
+      POSTGRES_DB: sepolia
     ports:
       - "5432:5432"
     volumes:
@@ -25,7 +25,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - NETWORK=${NETWORK:-mainnet}
+      - NETWORK=${NETWORK:-sepolia}
     env_file:
       - .env.local
     volumes:

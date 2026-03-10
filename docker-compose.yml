@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL for governance data
@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${GOVERNANCE_DB:-mainnet}
+      POSTGRES_DB: ${GOVERNANCE_DB:-sepolia}
     ports:
       - "${GOVERNANCE_DB_PORT:-5432}:5432"
     volumes:
@@ -32,8 +32,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      - NETWORK=${NETWORK:-mainnet}
-      - PG_CONNECTION_STRING=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-mainnet}
+      - NETWORK=${NETWORK:-sepolia}
+      - PG_CONNECTION_STRING=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-sepolia}
       - APIBARA_URL=${APIBARA_URL}
       - DNA_TOKEN=${DNA_TOKEN}
       - GOVERNOR_ADDRESS=${GOVERNOR_ADDRESS}
@@ -53,7 +53,7 @@ services:
     container_name: api
     environment:
       PORT: 4000
-      GOVERNANCE_DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-mainnet}
+      GOVERNANCE_DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-sepolia}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       CACHE_TTL_PROPOSALS: ${CACHE_TTL_PROPOSALS:-120}
       CACHE_TTL_VOTES: ${CACHE_TTL_VOTES:-60}
