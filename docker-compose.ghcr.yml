@@ -1,0 +1,63 @@
+services:
+  db:
+    image: ${GOVERNANCE_DB_IMAGE:-ghcr.io/cartridge-gg/governance-db:latest}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${GOVERNANCE_DB:-sepolia}
+    ports:
+      - "${GOVERNANCE_DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - network
+
+  indexer:
+    image: ${GOVERNANCE_INDEXER_IMAGE:-ghcr.io/cartridge-gg/governance-indexer:latest}
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NETWORK: ${NETWORK:-sepolia}
+      PG_CONNECTION_STRING: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-sepolia}
+      APIBARA_URL: ${APIBARA_URL:-sepolia.starknet.a5a.ch}
+      DNA_TOKEN: ${DNA_TOKEN}
+      GOVERNOR_ADDRESS: ${GOVERNOR_ADDRESS}
+      VOTES_TOKEN_ADDRESS: ${VOTES_TOKEN_ADDRESS}
+      STARTING_CURSOR_BLOCK_NUMBER: ${STARTING_CURSOR_BLOCK_NUMBER:-0}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NO_BLOCKS_TIMEOUT_MS: ${NO_BLOCKS_TIMEOUT_MS:-0}
+    restart: unless-stopped
+    networks:
+      - network
+
+  api:
+    image: ${GOVERNANCE_API_IMAGE:-ghcr.io/cartridge-gg/governance-api:latest}
+    environment:
+      PORT: ${API_PORT:-4000}
+      GOVERNANCE_DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${GOVERNANCE_DB:-sepolia}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      CACHE_TTL_PROPOSALS: ${CACHE_TTL_PROPOSALS:-120}
+      CACHE_TTL_VOTES: ${CACHE_TTL_VOTES:-60}
+      CACHE_TTL_DELEGATES: ${CACHE_TTL_DELEGATES:-300}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - network
+
+volumes:
+  db-data:
+
+networks:
+  network:
+    driver: bridge
