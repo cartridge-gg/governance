@@ -48,7 +48,7 @@ export function Header() {
             <Link to="/" className="flex items-center space-x-3 group">
               <img
                 src="/logo.png"
-                alt="Survivor Logo"
+                alt="Nums Logo"
                 className="h-10 sm:h-14 w-auto transition-transform group-hover:scale-110"
               />
             </Link>

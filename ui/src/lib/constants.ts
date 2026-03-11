@@ -1,25 +1,27 @@
 // Contract addresses - Update these with your deployed contract addresses
 export const GOVERNOR_ADDRESS =
-  "0x050897ea9df71b661b8eac53162be37552e729ee9d33a6f9ae0b61c95a11209e";
+  "0x243cc8dd3a73d19b42b5d359a11fb6d22b5ab1d240a81f8de292565f10f7655";
 
 // Temporary upgraded governor address for multicall voting
 // Set via VITE_UPGRADED_GOVERNOR_ADDRESS environment variable
 // Leave empty to disable multicall voting
-export const UPGRADED_GOVERNOR_ADDRESS =
-  "0x0200bddab3e990ee5807558804cb81068cc3115afa2cc1e3f9500b24ea192f64";
+export const UPGRADED_GOVERNOR_ADDRESS = "";
 
 export const TOKEN_ADDRESS =
-  "0x042dd777885ad2c116be96d4d634abc90a26a790ffb5871e037dd5ae7d2ec86b";
+  "0x2094aebd7235f213b0159f080a60b387402130071bda6e870f4af9e2f8674b6";
 
-// DAO Treasury address (Survivor DAO)
+// DAO Treasury address (NUMS DAO)
 export const DAO_TREASURY_ADDRESS =
-  "0x041bb7729efa185f2cab327de0a668886302f1d4969e3edf504c4741648f858b";
+  "0x3f0bff1617cb189e3a0c1adb077c6be5d37dd5fb2f891047acc359544833150";
 
 // Governance parameters
 export const GOVERNANCE_PARAMS = {
   PROPOSAL_THRESHOLD: "50,000 tokens",
-  VOTING_DELAY: "1 hour",
-  VOTING_PERIOD: "5 days",
+  // VOTING_DELAY: "1 hour",
+  // VOTING_PERIOD: "5 days",
+  // QUORUM_REQUIRED: "30%",
+  VOTING_DELAY: "5 minutes",
+  VOTING_PERIOD: "10 minutes",
   QUORUM_REQUIRED: "30%",
 } as const;
 

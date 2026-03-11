@@ -194,7 +194,7 @@ export function Proposals() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 main-container">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-['Cinzel'] font-black text-[#FFE97F] mb-2 sm:mb-3 glow">
-            SURVIVOR GOVERNANCE
+            NUMS GOVERNANCE
           </h1>
           <p className="text-gray-400 text-base sm:text-lg">
             Vote on active proposals and shape the future of the ecosystem

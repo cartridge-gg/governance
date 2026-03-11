@@ -1,6 +1,6 @@
-# Survivor Governance UI
+# Nums Governance UI
 
-A modern governance interface for the Survivor Governor contract built with React, Vite, and Starknet.
+A modern governance interface for the Nums Governor contract built with React, Vite, and Starknet.
 
 ## Features
 
@@ -20,11 +20,13 @@ A modern governance interface for the Survivor Governor contract built with Reac
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 bun install
 ```
 
 2. Configure your contract addresses in `src/config/contracts.ts`:
+
 ```typescript
 export const contracts = {
   governor: {
@@ -42,6 +44,7 @@ export const contracts = {
 ### Development
 
 Start the development server:
+
 ```bash
 bun dev
 ```
@@ -51,6 +54,7 @@ The app will be available at `http://localhost:5173`
 ### Build
 
 Build for production:
+
 ```bash
 bun run build
 ```
@@ -74,7 +78,7 @@ src/
 
 ## Contract Integration
 
-The UI is designed to work with the Survivor Governor contract. Before using the app:
+The UI is designed to work with the Nums Governor contract. Before using the app:
 
 1. Deploy your governance contracts on Starknet
 2. Update the contract addresses in `src/config/contracts.ts`
@@ -89,18 +93,21 @@ The UI is designed to work with the Survivor Governor contract. Before using the
 ## Features Overview
 
 ### Proposals Page
+
 - View all governance proposals
 - Filter by status (Active, Passed, Failed)
 - See voting statistics and quorum progress
 - Cast votes on active proposals
 
 ### Delegates Page
+
 - Browse community delegates
 - View delegation statistics
 - Delegate your voting power
 - Search and filter delegates
 
 ### Create Proposal Page
+
 - Write proposal title and description (Markdown supported)
 - Add multiple contract calls for execution
 - Preview proposal before submission
@@ -109,6 +116,7 @@ The UI is designed to work with the Survivor Governor contract. Before using the
 ## Wallet Connection
 
 The app supports:
+
 - Argent X
 - Braavos
 - Other Starknet-compatible wallets via get-starknet
@@ -116,6 +124,7 @@ The app supports:
 ## Styling
 
 The app uses a dark theme by default to match the Ekubo governance design. Colors and styling can be customized in:
+
 - `src/index.css` - CSS variables and Tailwind configuration
 - `tailwind.config.js` - Tailwind theme configuration
 

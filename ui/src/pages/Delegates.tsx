@@ -107,12 +107,12 @@ export function Delegates() {
             DELEGATE POWER
           </h1>
           <p className="text-gray-400 text-base sm:text-lg">
-            Help shape the future of <strong>Survivor DAO</strong> by delegating
+            Help shape the future of <strong>Nums DAO</strong> by delegating
             your voting power. Delegates govern the <strong>treasury</strong>{" "}
             and influence <strong>game configurations</strong>, ensuring the
             ecosystem grows in alignment with the community.{" "}
             <a
-              href="https://docs.provable.games/lootsurvivor/token/tokenomics#value-accrual-mechanisms"
+              href="https://docs.nums.gg"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#FFE97F] hover:underline"

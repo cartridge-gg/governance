@@ -22,7 +22,7 @@ import { type Call, hash } from "starknet";
 import { GOVERNANCE_PARAMS, DAO_TREASURY_ADDRESS } from "@/lib/constants";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useProvider } from "@starknet-react/core";
 import { getEntrypointName, getContractName } from "@/lib/contractMappings";
 import {
   parseRawCalls,
@@ -73,6 +73,7 @@ export function CreateProposal() {
   const { createProposal } = useGovernor();
   const { fireConfetti } = useConfetti();
   const { isConnected } = useAccount();
+  const { provider } = useProvider();
   const { toast } = useToast();
 
   const addCall = () => {
@@ -196,6 +197,8 @@ export function CreateProposal() {
       const result = await simulateProposal(
         DAO_TREASURY_ADDRESS,
         simulationCalls,
+        undefined,
+        provider,
       );
 
       setSimulationResult(result);
@@ -689,8 +692,7 @@ Brief overview of what this proposal aims to achieve.`}
             className="w-full btn-gold text-lg py-6"
             disabled={
               !description ||
-              !isConnected ||
-              !simulationResult?.success
+              !isConnected
             }
             onClick={handleSubmit}
             title={

@@ -1,13 +1,10 @@
-/**
- * Simulation service client for the governance proposal simulator
- */
+import { type ProviderInterface, TransactionType, ETransactionVersion3, EDataAvailabilityMode, num } from "starknet";
 import { findTokenByAddress, formatTokenAmount as formatTokenAmountUtil } from "@/lib/utils/tokenUtils";
 import { DAO_TREASURY_ADDRESS } from "@/lib/constants";
 
-// Types matching the governance-simulator API
 export interface SimulationCall {
   to: string;
-  selector: string;
+  selector: string; // pre-hashed selector (0x...)
   calldata: string[];
 }
 
@@ -47,69 +44,134 @@ export interface SimulationResult {
   feeEstimate?: string;
 }
 
-export interface SimulateRequest {
-  timelockAddress: string;
-  calls: SimulationCall[];
-  forkBlock?: number | "latest";
-  additionalTokens?: string[];
-}
+/**
+ * Recursively collect all events from an execution invocation trace
+ */
+function collectEventsFromInvocation(invocation: any): SimulatedEvent[] {
+  if (!invocation || "revert_reason" in invocation) return [];
 
-export interface SimulateResponse {
-  result?: SimulationResult;
-  error?: string;
-}
+  const events: SimulatedEvent[] = [];
+  const contractAddress = num.toHex(BigInt(invocation.contract_address ?? 0));
 
-// Default simulator API URL - can be overridden via environment variable
-const SIMULATOR_API_URL =
-  import.meta.env.VITE_SIMULATOR_API_URL || "http://localhost:3001";
+  for (const evt of invocation.events ?? []) {
+    events.push({
+      contractAddress,
+      keys: (evt.keys ?? []).map((k: any) => num.toHex(BigInt(k))),
+      data: (evt.data ?? []).map((d: any) => num.toHex(BigInt(d))),
+    });
+  }
+
+  for (const call of invocation.calls ?? []) {
+    events.push(...collectEventsFromInvocation(call));
+  }
+
+  return events;
+}
 
 /**
- * Simulate a governance proposal
+ * Simulate a governance proposal directly via starknet.js, without any backend.
+ * Builds the multicall calldata manually to avoid re-hashing pre-hashed selectors,
+ * then calls starknet_simulateTransactions with SKIP_VALIDATE from the timelock address.
  */
 export async function simulateProposal(
   timelockAddress: string,
   calls: SimulationCall[],
-  additionalTokens?: string[],
+  _additionalTokens?: string[],
+  provider?: ProviderInterface,
 ): Promise<SimulationResult> {
-  const response = await fetch(`${SIMULATOR_API_URL}/simulate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  if (!provider) {
+    throw new Error("A Starknet provider is required for simulation");
+  }
+
+  // Build multicall calldata manually — selectors are already hashed so we
+  // must NOT pass them through getSelectorFromName (which would double-hash).
+  const rawCalldata: string[] = [
+    num.toHex(calls.length),
+    ...calls.flatMap((c) => [
+      num.toHex(BigInt(c.to)),
+      c.selector,
+      num.toHex(c.calldata.length),
+      ...c.calldata,
+    ]),
+  ];
+
+  const zeroBounds = { max_amount: 0n, max_price_per_unit: 0n };
+
+  const simResults = await provider.getSimulateTransaction(
+    [
+      {
+        type: TransactionType.INVOKE,
+        contractAddress: timelockAddress,
+        calldata: rawCalldata,
+        signature: [],
+        nonce: 0,
+        version: ETransactionVersion3.F3,
+        resourceBounds: {
+          l1_gas: zeroBounds,
+          l2_gas: zeroBounds,
+          l1_data_gas: zeroBounds,
+        },
+        tip: 0n,
+        paymasterData: [],
+        accountDeploymentData: [],
+        nonceDataAvailabilityMode: EDataAvailabilityMode.L1,
+        feeDataAvailabilityMode: EDataAvailabilityMode.L1,
+      },
+    ],
+    { blockIdentifier: "latest", skipValidate: true, skipFeeCharge: true },
+  );
+
+  const sim = simResults[0];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const trace = sim.transaction_trace as any;
+  const executeInvocation = trace.execute_invocation;
+  const reverted =
+    executeInvocation && "revert_reason" in executeInvocation;
+
+  const events = collectEventsFromInvocation(executeInvocation);
+
+  const stateDiff = trace.state_diff;
+  const storageDiffs: StorageDiffEntry[] = [];
+  if (stateDiff?.storage_diffs) {
+    for (const diff of stateDiff.storage_diffs) {
+      for (const entry of diff.storage_entries ?? diff.entries ?? []) {
+        storageDiffs.push({
+          contractAddress: num.toHex(BigInt(diff.address)),
+          key: num.toHex(BigInt(entry.key)),
+          newValue: num.toHex(BigInt(entry.value)),
+        });
+      }
+    }
+  }
+
+  return {
+    success: !reverted,
+    revertReason: reverted ? executeInvocation.revert_reason : undefined,
+    stateDiff: {
+      storageDiffs,
+      deployedContracts: stateDiff?.deployed_contracts?.map((c: any) => ({
+        address: num.toHex(BigInt(c.address)),
+        classHash: num.toHex(BigInt(c.class_hash)),
+      })),
     },
-    body: JSON.stringify({
-      timelockAddress,
-      calls,
-      additionalTokens,
-    } satisfies SimulateRequest),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Simulation request failed: ${response.statusText}`);
-  }
-
-  const data: SimulateResponse = await response.json();
-
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
-  if (!data.result) {
-    throw new Error("No simulation result returned");
-  }
-
-  return data.result;
+    events,
+    gasEstimate: sim.resourceBounds
+      ? (
+          sim.resourceBounds.l2_gas?.max_amount ??
+          sim.resourceBounds.l1_gas?.max_amount
+        )?.toString()
+      : undefined,
+    feeEstimate:
+      sim.overall_fee !== undefined ? sim.overall_fee.toString() : undefined,
+  };
 }
 
 /**
- * Check if the simulator API is available
+ * Always returns true — simulation is now done directly via starknet.js,
+ * no external service required.
  */
 export async function checkSimulatorHealth(): Promise<boolean> {
-  try {
-    const response = await fetch(`${SIMULATOR_API_URL}/health`);
-    return response.ok;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 /**

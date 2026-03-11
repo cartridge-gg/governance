@@ -42,7 +42,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
             CONNECT WALLET
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Choose a wallet to connect to Survivor Governance
+            Choose a wallet to connect to Nums Governance
           </DialogDescription>
         </DialogHeader>
 

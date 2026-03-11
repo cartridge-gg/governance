@@ -12,12 +12,16 @@ import {
   Connector,
   InjectedConnector,
 } from "@starknet-react/core";
-import { mainnet, type Chain } from "@starknet-react/chains";
+import { sepolia, type Chain } from "@starknet-react/chains";
 import { ControllerConnector } from "@cartridge/connector";
 import { Toaster } from "@/components/ui/toaster";
+import { shortString } from "starknet";
 
 const controllerConnector = new ControllerConnector({
-  preset: "survivor-dao",
+  defaultChainId: shortString.encodeShortString("SN_SEPOLIA"),
+  chains: [{ rpcUrl: "https://api.cartridge.gg/x/starknet/sepolia" }],
+  preset: "nums",
+  slot: "nums-bal"
 });
 
 function App() {
@@ -34,9 +38,9 @@ function App() {
   const provider = jsonRpcProvider({
     rpc: (chain: Chain) => {
       switch (chain) {
-        case mainnet:
+        case sepolia:
           return {
-            nodeUrl: mainnet.rpcUrls.cartridge.http[0],
+            nodeUrl: sepolia.rpcUrls.cartridge.http[0],
           };
         default:
           throw new Error(`Unsupported chain: ${chain.network}`);
@@ -46,7 +50,7 @@ function App() {
 
   return (
     <StarknetConfig
-      chains={[mainnet]}
+      chains={[sepolia]}
       provider={provider}
       connectors={connectors as unknown as Connector[]}
       explorer={voyager}

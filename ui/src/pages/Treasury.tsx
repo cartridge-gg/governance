@@ -321,7 +321,7 @@ export function Treasury() {
             DAO TREASURY
           </h1>
           <p className="text-gray-400 text-lg mb-2">
-            View all assets held by the Survivor DAO treasury
+            View all assets held by the Nums DAO treasury
           </p>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span className="font-mono">
