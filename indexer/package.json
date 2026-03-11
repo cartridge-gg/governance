@@ -5,7 +5,8 @@
   "main": "index.js",
   "description": "Indexes Ekubo data",
   "scripts": {
-    "start": "NETWORK=mainnet jiti src/index.ts",
+    "start": "jiti src/index.ts",
+    "start:mainnet": "NETWORK=mainnet jiti src/index.ts",
     "start:sepolia": "NETWORK=sepolia jiti src/index.ts",
     "test": "vitest"
   },

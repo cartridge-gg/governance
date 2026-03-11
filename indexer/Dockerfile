@@ -10,4 +10,4 @@ COPY src ./src
 COPY tsconfig.json ./
 
 USER node
-CMD ["npm", "run", "start:sepolia"]
+CMD ["sh", "-c", "NETWORK=${NETWORK:-sepolia} npm start"]
