@@ -91,6 +91,52 @@ Deploy these 3 backend services:
 2. **indexer** (from `./indexer` directory)
 3. **api** (from `./api` directory)
 
+### GHCR Images
+
+GitHub Actions publishes the backend images to GHCR from the default branch and version tags:
+
+- `ghcr.io/cartridge-gg/governance-api:latest`
+- `ghcr.io/cartridge-gg/governance-indexer:latest`
+
+Immutable `sha-...` tags are also published for each workflow run.
+
+To run the published images together, use:
+
+```bash
+docker compose --env-file .env -f docker-compose.ghcr.yml up -d
+```
+
+Example Sepolia run commands:
+
+```bash
+docker run -d \
+  --name governance-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=sepolia \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+docker run -d \
+  --name governance-api \
+  --network host \
+  -e PORT=4000 \
+  -e GOVERNANCE_DB_URL=postgresql://postgres:postgres@127.0.0.1:5432/sepolia \
+  -e CORS_ORIGIN='*' \
+  ghcr.io/cartridge-gg/governance-api:latest
+
+docker run -d \
+  --name governance-indexer \
+  --network host \
+  -e NETWORK=sepolia \
+  -e PG_CONNECTION_STRING=postgresql://postgres:postgres@127.0.0.1:5432/sepolia \
+  -e APIBARA_URL=sepolia.starknet.a5a.ch \
+  -e DNA_TOKEN=your_token \
+  -e GOVERNOR_ADDRESS=0x... \
+  -e VOTES_TOKEN_ADDRESS=0x... \
+  ghcr.io/cartridge-gg/governance-indexer:latest
+```
+
 For detailed deployment instructions, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
 
 ### Frontend Deployment (Vercel/Netlify)

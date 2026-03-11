@@ -1,15 +1,13 @@
-FROM node:22.10.0-alpine
+FROM node:22.12.0-alpine
 
+ENV NODE_ENV=production
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Install dependencies
-RUN npm install
+COPY src ./src
+COPY tsconfig.json ./
 
-# Copy source code
-COPY . .
-
-# Default command - will be overridden by docker-compose
-CMD ["npm", "start"]
+USER node
+CMD ["sh", "-c", "NETWORK=${NETWORK:-sepolia} npm start"]
