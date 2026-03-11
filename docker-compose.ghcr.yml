@@ -1,6 +1,6 @@
 services:
   db:
-    image: ${GOVERNANCE_DB_IMAGE:-ghcr.io/cartridge-gg/governance-db:latest}
+    image: ${GOVERNANCE_DB_IMAGE:-postgres:15-alpine}
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}

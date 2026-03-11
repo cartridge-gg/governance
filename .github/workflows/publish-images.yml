@@ -19,10 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: db
-            image: governance-db
-            context: .
-            file: ./db/Dockerfile
           - name: api
             image: governance-api
             context: ./api

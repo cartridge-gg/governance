@@ -95,7 +95,6 @@ Deploy these 3 backend services:
 
 GitHub Actions publishes the backend images to GHCR from the default branch and version tags:
 
-- `ghcr.io/cartridge-gg/governance-db:latest`
 - `ghcr.io/cartridge-gg/governance-api:latest`
 - `ghcr.io/cartridge-gg/governance-indexer:latest`
 
@@ -116,7 +115,7 @@ docker run -d \
   -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=sepolia \
   -p 5432:5432 \
-  ghcr.io/cartridge-gg/governance-db:latest
+  postgres:15-alpine
 
 docker run -d \
   --name governance-api \
