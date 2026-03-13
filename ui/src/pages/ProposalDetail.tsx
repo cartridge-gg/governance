@@ -375,7 +375,7 @@ export function ProposalDetail() {
         return {
           contractAddress: bigintToHex(call.to_address),
           entrypoint: selectorHex, // Pass selector as entrypoint for now
-          calldata: call.calldata.map((data: any) => bigintToHex(data)),
+          calldata: (call.calldata ?? []).map((data: any) => bigintToHex(data)),
         };
       });
 
@@ -437,7 +437,7 @@ export function ProposalDetail() {
         return {
           contractAddress: bigintToHex(call.to_address),
           entrypoint: selectorHex, // Pass selector as entrypoint for now
-          calldata: call.calldata.map((data: any) => bigintToHex(data)),
+          calldata: (call.calldata ?? []).map((data: any) => bigintToHex(data)),
         };
       });
 
