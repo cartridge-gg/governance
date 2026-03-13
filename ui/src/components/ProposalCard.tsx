@@ -111,7 +111,7 @@ export function ProposalCard({ proposal, usernames }: ProposalCardProps) {
               </div>
               <div className="flex items-center gap-2 ml-auto sm:ml-0">
                 <img
-                  src={profile?.avatar || "/avatars/adventurer.png"}
+                  src={profile?.avatar || "/avatars/nums.svg"}
                   alt={
                     usernames?.get(proposal.proposer.toLowerCase()) ||
                     profile?.name ||

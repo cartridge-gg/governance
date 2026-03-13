@@ -286,7 +286,7 @@ export function DelegatesList({
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                       <img
-                        src={profile?.avatar || "/avatars/adventurer.png"}
+                        src={profile?.avatar || "/avatars/nums.svg"}
                         alt={profile?.name || "Delegate"}
                         className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-2 border-[#FFE97F]/30"
                       />

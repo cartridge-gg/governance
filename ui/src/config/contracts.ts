@@ -29,8 +29,12 @@ export const contracts = {
 
   // Governance parameters (from your Cairo contract)
   parameters: {
-    votingDelay: 3600, // 1 hour
-    votingPeriod: 432000, // 5 days
+    // votingDelay: 3600, // 1 hour
+    // votingPeriod: 432000, // 5 days
+    // proposalThreshold: "50000000000000000000000", // 50k tokens with 18 decimals
+    // quorumNumerator: 300, // 30%
+    votingDelay: 5 * 60, // 5 minutes
+    votingPeriod: 10 * 60, // 10 minutes
     proposalThreshold: "50000000000000000000000", // 50k tokens with 18 decimals
     quorumNumerator: 300, // 30%
   },

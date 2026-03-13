@@ -497,8 +497,6 @@ export function ProposalDetail() {
     }
   };
 
-  console.log(calls);
-
   return (
     <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
       {/* Back Button */}
@@ -529,7 +527,7 @@ export function ProposalDetail() {
             </div>
             <div className="flex items-center gap-2 whitespace-nowrap ml-auto sm:ml-0">
               <img
-                src={proposerProfile?.avatar || "/avatars/adventurer.png"}
+                src={proposerProfile?.avatar || "/avatars/nums.svg"}
                 alt={
                   usernames?.get(proposerAddress.toLowerCase()) ||
                   proposerProfile?.name ||
@@ -835,7 +833,7 @@ export function ProposalDetail() {
                       <div className="flex items-center gap-2 sm:gap-3">
                         <img
                           src={
-                            voterProfile?.avatar || "/avatars/adventurer.png"
+                            voterProfile?.avatar || "/avatars/nums.svg"
                           }
                           alt={
                             cartridgeUsername || voterProfile?.name || "Voter"
